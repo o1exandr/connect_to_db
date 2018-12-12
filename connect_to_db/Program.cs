@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Net.Mail;
@@ -17,13 +13,18 @@ namespace connect_to_db
             string conStr = ConfigurationManager.AppSettings["ConnectionString"];
             SqlConnection con = new SqlConnection(conStr);
 
+            // пошук емейлу 
             UserProvider up = new UserProvider(con);
-            bool success = up.Login("mail@mail", "123456");
-            Console.WriteLine("success = {0}", success);
+            string mail = "Josiane4@hotmail.com";
+            bool success = up.Login(mail);
+            Console.WriteLine("Founded = {0}", success);
 
-            string mail = "mail@mail.com";
-            Console.WriteLine($"\n{mail} is {EmailChecker(mail)}\n");
+            // перевірка емейлу на валідність
+            Console.WriteLine("\n\tEmail checker");            
+            Console.WriteLine($"{mail} is {EmailChecker(mail)}\n");
 
+            // перевірка паролю на валідність
+            Console.WriteLine("\tPassword checker");
             string[] pass = { "Qwer!", "Qwerty1!", "123456", "qwertyu1", "Qwerty1 " };
             for (int i = 0; i < pass.Length; i++)
                 //Console.WriteLine($"{pass[i],10} - {PasswordChecker(pass[i])}");
@@ -32,6 +33,7 @@ namespace connect_to_db
             con.Close();
         }
 
+        // метод валідності емейлу
         static bool EmailChecker(string email)
         {
             MailAddress mail = new MailAddress(email);
@@ -41,49 +43,7 @@ namespace connect_to_db
                 return false;
         }
 
-        static bool PasswordChecker(string pass)
-        {
-            if (pass.Length < 6)
-            {
-                //Console.WriteLine("Is to short!");
-                return false;
-            }
-
-            bool Up = false;
-            bool Low = false;
-            bool Digit = false;
-            bool Symb = false;
-
-            foreach (char c in pass)
-            {
-                if (char.IsUpper(c))
-                    Up = true;
-                else
-                    if (char.IsLower(c))
-                    Low = true;
-                else
-                    if (char.IsDigit(c))
-                    Digit = true;
-                else
-                    if (char.IsPunctuation(c))
-                    Symb = true;
-                //Console.WriteLine($"{Up}\t{Low}\t{Digit}\t{Symb}");
-            }
-
-            if (Up && Low && Digit && Symb)
-            {
-                return true;
-            }
-            else
-            {
-                //Console.WriteLine("Wrong password");
-                return false;
-            }
-
-
-
-
-        }
+        // метод валідності паролю за допомогою Regex
         public static bool IsValidPassword(string plainText)
         {
             Regex regex = new Regex(@"^(.{0,7}|[^0-9]*|[^A-Z])$");
